@@ -4,9 +4,36 @@
 #include <unistd.h>
 #include "../include/hash.h"
 #include "../include/utils.h"
-#include "sys/stat.h"
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <fcntl.h>
+
+#define WRITE (O_RDWR| O_CREAT | O_TRUNC)
+#define PERM (S_IRUSR | S_IWUSR)
+#define BUFSIZE 2056
 
 char *output_file_folder = "output/inter_submission/";
+
+static void makedir(const char *dir) {
+        char temp_var[256];
+        char *ptr = NULL;
+        size_t ln;
+
+        snprintf(temp_var, sizeof(temp_var),"%s",dir);
+        ln = strlen(temp_var);
+        if (temp_var[ln - 1] == '/')
+            temp_var[ln - 1] = 0;
+        for (ptr = temp_var + 1; *ptr; ptr++)
+            if (*ptr == '/') {
+                *ptr = 0;
+                mkdir(temp_var, WRITE|PERM);
+                *ptr = '/';
+            }
+        if(mkdir(temp_var, WRITE|PERM)!=0)
+        {
+            //fprintf(stderr, "Unable to open dir %s\n", temp_var);
+        }
+    }
 
 int main(int argc, char* argv[]) {
     if (argc != 3) {
@@ -20,10 +47,20 @@ int main(int argc, char* argv[]) {
 
     //TODO(): create the hash of given file
 
-
+    char* hash_value=(char*)malloc(sizeof(char)*BUFSIZE*7);
+    
+    hash_data_block(hash_value,file_path);
+    printf("\n");
     //TODO(): construct string write to pipe. The format is "<file_path>|<hash_value>"
+    char WriteToPipe[2056];
+    
+    printf("%s\n",WriteToPipe);
+    strcat(WriteToPipe,file_path);
+    strcat(WriteToPipe,"|");
+    strcat(WriteToPipe,hash_value);
+    strcat(WriteToPipe,"|");
 
-
+    
     if(pipe_write_end==0){
 
 
@@ -41,18 +78,22 @@ int main(int argc, char* argv[]) {
         char file_loc[1000]="";
         strcat(file_loc,output_file_folder);
         strcat(file_loc,root_dir);
-        //printf("file location %s \n",file_loc);
-        mkdir(file_loc, S_IRWXU);
+        makedir(file_loc);
         
         strcat(file_loc,file_name);
 
         //TODO(step4): create and write to file, and then close file
         
 
+        //int fd =open(file_loc,WRITE,PERM);
         FILE *fd =fopen(file_loc,"w+");
         if(fd==NULL){
             fprintf(stderr, "Unable to open file %s\n", file_loc);
             exit(-1);
+        }
+        int results = fputs(WriteToPipe, fd);
+        if (results == EOF) {
+            // Failed to write do error code here.
         }
         fclose(fd);
         //TODO(step5): free any arrays that are allocated using malloc!! Free the string returned from extract_root_directory()!! It is allocated using malloc in extract_root_directory()
@@ -63,6 +104,11 @@ int main(int argc, char* argv[]) {
         exit(0);
 
     }
+
+    free(hash_value);
+    //free(WriteToPipe);
+    hash_value=NULL;
+    //WriteToPipe=NULL;
 
     exit(0);
 }
