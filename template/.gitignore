@@ -3,3 +3,6 @@ leaf_process
 nonleaf_process
 lib/utils.o
 output/
+root_directories/root1/
+root_directories/root2/
+root_directories/root3/
