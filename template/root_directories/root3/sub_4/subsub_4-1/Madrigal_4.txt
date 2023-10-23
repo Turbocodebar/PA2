@@ -1,1 +1,0 @@
-./root_directories/root3/sub_3/Madrigal_1.txt

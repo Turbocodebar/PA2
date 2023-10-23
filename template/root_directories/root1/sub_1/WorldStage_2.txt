@@ -1,1 +1,0 @@
-./root_directories/root1/sub_3/WorldStage_1.txt

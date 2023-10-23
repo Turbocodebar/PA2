@@ -1,1 +1,0 @@
-./root_directories/root3/sub_1/FairySong_1.txt
