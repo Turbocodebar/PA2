@@ -12,6 +12,10 @@
 - creating output folder (Tyler)
 - write file name and hash to files(Jonathan)
 
+**Makefile Changes**
+- added output/ to clean script
+- added scripts to diff between output/ and expected/
+
 **Process Tree Pseudocode**
  nonleaf_process.c:
 

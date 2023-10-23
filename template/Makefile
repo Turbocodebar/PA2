@@ -54,3 +54,12 @@ final:
 clean:
 	rm -f root_process leaf_process nonleaf_process
 	rm -rf *.dSYM/
+	rm -rf output/
+
+# CUSTOM
+.PHONY: test_inter
+
+test_inter:
+	diff output/inter_submission/root1/ expected/inter_submission/root1
+	diff output/inter_submission/root2/ expected/inter_submission/root2
+	diff output/inter_submission/root3/ expected/inter_submission/root3
