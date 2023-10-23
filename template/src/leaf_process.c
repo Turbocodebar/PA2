@@ -41,41 +41,32 @@ int main(int argc, char* argv[]) {
         printf("Usage: Final Submission --> ./leaf_process <file_path> <pipe_write_end>\n");
         return -1;
     }
+
     //TODO(): get <file_path> <pipe_write_end> from argv[]
     char *file_path=argv[1];
     int pipe_write_end=atoi(argv[2]);
 
     //TODO(): create the hash of given file
-
-    char* hash_value=(char*)malloc(sizeof(char)*BUFSIZE*7);
-    
+    char* hash_value=(char*)malloc(sizeof(char)*BUFSIZE);
     hash_data_block(hash_value,file_path);
     printf("\n");
+
     //TODO(): construct string write to pipe. The format is "<file_path>|<hash_value>"
-    char WriteToPipe[2056];
-    
-    printf("%s\n",WriteToPipe);
-    strcat(WriteToPipe,file_path);
-    strcat(WriteToPipe,"|");
-    strcat(WriteToPipe,hash_value);
-    strcat(WriteToPipe,"|");
+    char WriteToPipe[BUFSIZE];
+    sprintf(WriteToPipe, "%s|%s|", file_path, hash_value);
 
-    
     if(pipe_write_end==0){
-
-
         //TODO(inter submission)
         //TODO(overview): create a file in output_file_folder("output/inter_submission/root*") and write the constructed string to the file
-        //TODO(step1): extract the file_name from file_path using extract_filename() in utils.c
-        char file_name[1000]="";
-        strcat(file_name,extract_filename(file_path));
-        //TODO(step2): extract the root directory(e.g. root1 or root2 or root3) from file_path using extract_root_directory() in utils.c
-        char root_dir[1000]="";
-        strcat(root_dir, extract_root_directory(file_path));
 
+        //TODO(step1): extract the file_name from file_path using extract_filename() in utils.c
+        char* file_name = extract_filename(file_path);
+
+        //TODO(step2): extract the root directory(e.g. root1 or root2 or root3) from file_path using extract_root_directory() in utils.c
+        char* root_dir = extract_root_directory(file_path);
 
         //TODO(step3): get the location of the new file (e.g. "output/inter_submission/root1" or "output/inter_submission/root2" or "output/inter_submission/root3")
-        char file_loc[1000]="";
+        char file_loc[BUFSIZE]="";
         strcat(file_loc,output_file_folder);
         strcat(file_loc,root_dir);
         makedir(file_loc);
@@ -83,9 +74,6 @@ int main(int argc, char* argv[]) {
         strcat(file_loc,file_name);
 
         //TODO(step4): create and write to file, and then close file
-        
-
-        //int fd =open(file_loc,WRITE,PERM);
         FILE *fd =fopen(file_loc,"w+");
         if(fd==NULL){
             fprintf(stderr, "Unable to open file %s\n", file_loc);
@@ -96,19 +84,17 @@ int main(int argc, char* argv[]) {
             // Failed to write do error code here.
         }
         fclose(fd);
+
         //TODO(step5): free any arrays that are allocated using malloc!! Free the string returned from extract_root_directory()!! It is allocated using malloc in extract_root_directory()
+        free(root_dir);
 
     }else{
         //TODO(final submission): write the string to pipe
-
         exit(0);
-
     }
 
     free(hash_value);
-    //free(WriteToPipe);
     hash_value=NULL;
-    //WriteToPipe=NULL;
 
     exit(0);
 }
