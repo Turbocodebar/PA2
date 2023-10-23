@@ -57,9 +57,16 @@ clean:
 	rm -rf output/
 
 # CUSTOM
-.PHONY: test_inter
+.PHONY: prep_output diff_inter
 
-test_inter:
+prep_output:
+	mkdir -p -m 0777 output/inter_submission/root1
+	mkdir -p -m 0777 output/inter_submission/root2
+	mkdir -p -m 0777 output/inter_submission/root3
+
+diff_inter:
 	diff output/inter_submission/root1/ expected/inter_submission/root1
 	diff output/inter_submission/root2/ expected/inter_submission/root2
 	diff output/inter_submission/root3/ expected/inter_submission/root3
+
+test_inter: clean prep_output leaf_process inter diff_inter

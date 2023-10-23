@@ -12,29 +12,6 @@
 #define PERM (S_IRUSR | S_IWUSR)
 #define BUFSIZE 2056
 
-char *output_file_folder = "output/inter_submission/";
-
-static void makedir(const char *dir) {
-        char temp_var[256];
-        char *ptr = NULL;
-        size_t ln;
-
-        snprintf(temp_var, sizeof(temp_var),"%s",dir);
-        ln = strlen(temp_var);
-        if (temp_var[ln - 1] == '/')
-            temp_var[ln - 1] = 0;
-        for (ptr = temp_var + 1; *ptr; ptr++)
-            if (*ptr == '/') {
-                *ptr = 0;
-                mkdir(temp_var, WRITE|PERM);
-                *ptr = '/';
-            }
-        if(mkdir(temp_var, WRITE|PERM)!=0)
-        {
-            //fprintf(stderr, "Unable to open dir %s\n", temp_var);
-        }
-    }
-
 int main(int argc, char* argv[]) {
     if (argc != 3) {
         printf("Usage: Inter Submission --> ./leaf_process <file_path> 0\n");
@@ -66,22 +43,18 @@ int main(int argc, char* argv[]) {
         char* root_dir = extract_root_directory(file_path);
 
         //TODO(step3): get the location of the new file (e.g. "output/inter_submission/root1" or "output/inter_submission/root2" or "output/inter_submission/root3")
-        char file_loc[BUFSIZE]="";
-        strcat(file_loc,output_file_folder);
-        strcat(file_loc,root_dir);
-        makedir(file_loc);
-        
-        strcat(file_loc,file_name);
+        char file_loc[BUFSIZE];
+        sprintf(file_loc, "output/inter_submission/%s/%s", root_dir, file_name);
 
         //TODO(step4): create and write to file, and then close file
-        FILE *fd =fopen(file_loc,"w+");
+        FILE *fd = fopen(file_loc,"w+");
         if(fd==NULL){
-            fprintf(stderr, "Unable to open file %s\n", file_loc);
+            fprintf(stderr, "failed to open file %s\n", file_loc);
             exit(-1);
         }
-        int results = fputs(WriteToPipe, fd);
-        if (results == EOF) {
-            // Failed to write do error code here.
+        if (fputs(WriteToPipe, fd) == EOF) {
+            fprintf(stderr, "failed to write to file %s\n", file_loc);
+            exit(-1);
         }
         fclose(fd);
 

@@ -14,6 +14,7 @@
 
 **Makefile Changes**
 - added output/ to clean script
+- added a script to create output/ folders
 - added scripts to diff between output/ and expected/
 
 **Process Tree Pseudocode**
