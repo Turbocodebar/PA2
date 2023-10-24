@@ -24,14 +24,14 @@ int main(int argc, char* argv[]) {
     //TODO(): get <file_path> <pipe_write_end> from argv[]
     char *file_path=argv[1];
     int pipe_write_end=atoi(argv[2]);
+    printf("leaf: %s\n", file_path);
 
     //TODO(): create the hash of given file
     char* hash_value=(char*)malloc(sizeof(char)*BUFSIZE);
     hash_data_block(hash_value,file_path);
-    printf("\n");
 
     //TODO(): construct string write to pipe. The format is "<file_path>|<hash_value>"
-    char WriteToPipe[BUFSIZE];
+    char WriteToPipe[BUFSIZE] = "";
     sprintf(WriteToPipe, "%s|%s|", file_path, hash_value);
 
     if(pipe_write_end==0){
@@ -45,7 +45,7 @@ int main(int argc, char* argv[]) {
         char* root_dir = extract_root_directory(file_path);
 
         //TODO(step3): get the location of the new file (e.g. "output/inter_submission/root1" or "output/inter_submission/root2" or "output/inter_submission/root3")
-        char file_loc[BUFSIZE];
+        char file_loc[BUFSIZE] = "";
         sprintf(file_loc, "%s%s/%s", output_file_folder, root_dir, file_name);
 
         //TODO(step4): create and write to file, and then close file
