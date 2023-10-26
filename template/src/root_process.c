@@ -30,12 +30,13 @@ void redirection(char **dup_list, int size, char* root_dir){
     //TODO(step3): read the content each symbolic link in dup_list, write the path as well as the content of symbolic link to output file(as shown in expected)
     size_t link_size;
     char link_buffer[5000]; //not sure what to set this to either
+    memset(link_buffer, 0, 5000);
     
     for(int i = 0; i < size; i++){
         link_size = readlink(dup_list[i], link_buffer, sizeof(link_buffer));
         if(link_size != -1){
             link_buffer[link_size] = '\0';      //Removes Null values from the string so printf can be used
-            printf("%s -> %s\n", dup_list[i], link_buffer);
+            printf("%s --> %s\n", dup_list[i], link_buffer);
         }
     }
 
@@ -75,7 +76,7 @@ int main(int argc, char* argv[]) {
 
     char* root_directory = argv[1];
     char all_filepath_hashvalue[4098]; //buffer for gathering all data transferred from child process
-    memset(all_filepath_hashvalue, 0, sizeof(all_filepath_hashvalue));// clean the buffer
+    memset(all_filepath_hashvalue, 0, 4098);// clean the buffer. piazza post mentioned removing size of for the last element
 
     //TODO(step1): construct pipe
 
@@ -88,6 +89,7 @@ int main(int argc, char* argv[]) {
     //TODO(step2): fork() child process & read data from pipe to all_filepath_hashvalue
     pid_t pid = fork();
     char fd_write[20];
+    memset(fd_write, 0, 20);
     if(pid == 0){       //child process function, run nonleaf process using execl
         sprintf(fd_write, "%d", fd[1]);
         execl("./nonleaf_process", "./nonleaf_process", root_directory, fd_write, (char *) NULL);
@@ -101,8 +103,12 @@ int main(int argc, char* argv[]) {
     //TODO(step3): malloc dup_list and retain list & use parse_hash() in utils.c to parse all_filepath_hashvalue
     // dup_list: list of paths of duplicate files. We need to delete the files and create symbolic links at the location
     // retain_list: list of paths of unique files. We will create symbolic links for those files
-    char **dup_list = (char **)malloc(10 * sizeof(char *));
-    char **retain_list = (char **)malloc(10 * sizeof(char *));
+    char **dup_list = (char **)malloc(50 * sizeof(char *));
+    char **retain_list = (char **)malloc(50 * sizeof(char *));
+    for(int i = 0; i < 10; i++){
+        dup_list[i] = (char *)malloc(50 * sizeof(char));
+        retain_list[i] = (char *)malloc(50 * sizeof(char));
+    }
 
     //10 is the max number of files from assumptions
 
@@ -114,10 +120,10 @@ int main(int argc, char* argv[]) {
     redirection(dup_list, size, argv[1]);
 
     //TODO(step5): free any arrays that are allocated using malloc!!
-    for(int i = 0; i < size; i++){
-        free(dup_list[i]);
-        free(retain_list[i]);
-    }
+    // for(int i = 0; i < size; i++){       done in template code
+    //     free(dup_list[i]);
+    //     free(retain_list[i]);
+    // }
     free(dup_list);
     free(retain_list);
 
