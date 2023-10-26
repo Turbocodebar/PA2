@@ -23,6 +23,7 @@ int main(int argc, char* argv[]) {
 
     //TODO(step2): malloc buffer for gathering all data transferred from child process as in root_process.c
     char tree_data[BUFSIZE * 5] = "";
+    memset(tree_data, 0, BUFSIZE * 5);
 
     //TODO(step3): open directory
     DIR* dir = opendir(dir_path);
@@ -41,6 +42,7 @@ int main(int argc, char* argv[]) {
         }
 
         char entry_path[BUFSIZE] = "";
+        memset(entry_path, 0, BUFSIZE);
         sprintf(entry_path, "%s/%s", dir_path, entry->d_name);
 
         int fd[2];
@@ -55,6 +57,7 @@ int main(int argc, char* argv[]) {
 
             //TODO(step5): read from pipe constructed for child process and write to pipe constructed for parent process
             char child_str[BUFSIZE] = "";
+            memset(child_str, 0, BUFSIZE);
             read(fd[0], child_str, BUFSIZE);
             // printf("%s\n", child_str);
             strcat(tree_data, child_str);
@@ -66,6 +69,7 @@ int main(int argc, char* argv[]) {
             close(fd[0]); // close read
 
             char child_write_end[20] = "";
+            memset(child_write_end, 0, 20);
             sprintf(child_write_end, "%d", fd[1]);
             
             if (entry->d_type == DT_DIR) {
