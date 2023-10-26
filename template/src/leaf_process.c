@@ -24,7 +24,7 @@ int main(int argc, char* argv[]) {
     //TODO(): get <file_path> <pipe_write_end> from argv[]
     char *file_path=argv[1];
     int pipe_write_end=atoi(argv[2]);
-    printf("leaf: %s\n", file_path);
+    // printf("leaf: %s\n", file_path);
 
     //TODO(): create the hash of given file
     char* hash_value=(char*)malloc(sizeof(char)*BUFSIZE);
@@ -65,6 +65,7 @@ int main(int argc, char* argv[]) {
 
     }else{
         //TODO(final submission): write the string to pipe
+        write(pipe_write_end, WriteToPipe, strlen(WriteToPipe));
         exit(0);
     }
 

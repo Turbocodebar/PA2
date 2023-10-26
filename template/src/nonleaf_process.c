@@ -19,10 +19,10 @@ int main(int argc, char* argv[]) {
     //TODO(step1): get <file_path> <pipe_write_end> from argv[]
     char* dir_path = argv[1];
     int pipe_write_end = atoi(argv[2]);
-    printf("nonleaf: %s\n", dir_path);
+    // printf("nonleaf: %s\n", dir_path);
 
     //TODO(step2): malloc buffer for gathering all data transferred from child process as in root_process.c
-
+    char tree_data[BUFSIZE * 5] = "";
 
     //TODO(step3): open directory
     DIR* dir = opendir(dir_path);
@@ -51,31 +51,45 @@ int main(int argc, char* argv[]) {
 
         pid_t pid = fork();
         if (pid != 0) { // parent
-            // close write end, only read from child
-            // close(fd[1]);
-            // store read end in array of pipes to children
-            // ?
+            close(fd[1]); // close write
+
+            //TODO(step5): read from pipe constructed for child process and write to pipe constructed for parent process
+            char child_str[BUFSIZE] = "";
+            read(fd[0], child_str, BUFSIZE);
+            // printf("%s\n", child_str);
+            strcat(tree_data, child_str);
+
+            close(fd[0]); // done reading
+            waitpid(pid, NULL, 0);
+            close(fd[1]); // close child's write end after exit
         } else { // child
-            // close read end, only write to parent
-            // close(fd[0]);
-            char proc_name[BUFSIZE] = "";
+            close(fd[0]); // close read
+
+            char child_write_end[20] = "";
+            sprintf(child_write_end, "%d", fd[1]);
+            
             if (entry->d_type == DT_DIR) {
                 // directory: spawn new nonleaf
                 // printf("dir: %s\n", entry_path);
-                sprintf(proc_name, "./nonleaf_process");
+                char *argv[] = {"./nonleaf_process", entry_path, child_write_end, NULL};
+                if (execvp(*argv, argv) < 0) {
+                    printf("failed to run nonleaf for %s\n", entry_path);
+                    return 1;
+                }
             } else if (entry->d_type == DT_REG) {
                 // regular file: spawn leaf
                 // printf("file: %s\n", entry_path);
-                sprintf(proc_name, "./leaf_process");
-            }
-            char *argv[] = {proc_name, entry_path, "0", NULL};
-            if (execvp(*argv, argv) < 0) {
-                printf("failed to run %s for %s\n", proc_name, entry_path);
-                return 1;
+                char *argv[] = {"./leaf_process", entry_path, child_write_end, NULL};
+                if (execvp(*argv, argv) < 0) {
+                    printf("failed to run leaf for %s\n", entry_path);
+                    return 1;
+                }
             }
         }
     }
     closedir(dir);
 
-    //TODO(step5): read from pipe constructed for child process and write to pipe constructed for parent process
+    // write complete subtree data to parent pipe
+    // printf("%s\n", tree_data);
+    write(pipe_write_end, tree_data, strlen(tree_data));
 }
