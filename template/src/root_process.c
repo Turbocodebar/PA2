@@ -36,7 +36,7 @@ void redirection(char **dup_list, int size, char* root_dir){
         link_size = readlink(dup_list[i], link_buffer, sizeof(link_buffer));
         if(link_size != -1){
             link_buffer[link_size] = '\0';      //Removes Null values from the string so printf can be used
-            printf("%s --> %s\n", dup_list[i], link_buffer);
+            printf("[<path of symbolic link> --> <path of retained file>] : [%s --> %s]\n", dup_list[i], link_buffer);
         }
     }
 
