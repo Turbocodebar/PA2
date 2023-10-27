@@ -8,11 +8,11 @@
 **Tested On:csel-kh1250-25.cselabs.umn.edu**
 
 **Contributions:**
-- setting up the repo (Louis)
-- creating output folder (Tyler)
-- write file name and hash to files(Jonathan)
+- git repo creation, leaf_process (Louis)
+- ouput setup, root_process (Tyler)
+- makefile updates, nonleaf_process (Jonathan)
 
-**Makefile Changes**
+**Makefile Changes:**
 - added output/ to clean script
 - added a script to create output/ folders
 - added scripts to diff between output/ and expected/
@@ -21,13 +21,20 @@
  nonleaf_process.c:
 
 ```
-    fork_child_process()
+    tree_data = ""
 
-    if is_child_process():
-        close_unused_pipe_end(read_pipe_fd)
-        set_up_communication(write_pipe_fd, read_pipe_fd)
-        exec("nonleaf_processs.c", path, read_pipe_fd)
-
+    for entry in dir
+        pipe = create_pipe()
+        fork()
+        if parent
+            tree_data += read_from_pipe()
+        else
+            if entry.type == dir
+                exec("nonleaf_process", entry.path, pipe.write)
+            else if entry.type == file
+                exec("leaf_process", entry.path, pipe.write)
+    
+    send_to_parent(tree_data)
 ```
 
 root_process.c:
